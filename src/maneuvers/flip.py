@@ -1,9 +1,9 @@
 from rlbot.agents.base_agent import SimpleControllerState
 
-from routines.routine import Routine
+from maneuvers.maneuver import Maneuver
 
 
-class Flip(Routine):
+class Flip(Maneuver):
     def __init__(self, bot,
                  target=None,
                  boost=False,
@@ -12,7 +12,7 @@ class Flip(Routine):
                  t_aim=0.08,
                  t_second_jump=0.28,
                  t_second_wait=0.14):
-        super().__init__()
+        super().__init__(bot)
 
         self._start_time = bot.info.time
         self._almost_finished = False
@@ -25,24 +25,24 @@ class Flip(Routine):
 
         self._t_steady_again = 0.25  # Time on ground before steady and ready again
 
-    def exec(self, bot) -> SimpleControllerState:
-        ct = bot.info.time - self._start_time
+    def step(self, dt) -> SimpleControllerState:
+        ct = self.bot.info.time - self._start_time
         controls = SimpleControllerState()
         controls.throttle = 1
-        car = bot.info.my_car
+        car = self.bot.info.my_car
 
         corner_debug = "ct: {}\n".format(ct)
         corner_debug += "_start_time: {}\n".format(self._start_time)
         corner_debug += "_t_finishing: {}\n".format(type(self._t_finishing))
-        bot.renderer.draw_string_2d(10, 200, 1, 1,
-                            corner_debug, bot.renderer.white())
+        self.bot.renderer.draw_string_2d(10, 200, 1, 1,
+                            corner_debug, self.bot.renderer.white())
 
         if ct >= self._t_finishing:
             self._almost_finished = True
             if car.on_ground:
-                self.done = True
+                self.finished = True
             # else:
-                # bot.maneuver = RecoveryManeuver(bot)
+                # self.bot.maneuver = RecoveryManeuver(self.bot)
                 # self.done = True
             return controls
         elif ct >= self._t_second_unjump:
