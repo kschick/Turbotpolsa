@@ -7,14 +7,14 @@ from util.vec import Vec3
 
 
 class Kickoff(Maneuver):
-    def __init__(self, bot):
-        super().__init__(bot)
-        ball = bot.info.ball
-        self.drive = Drive(bot, ball.pos)
+    def __init__(self, car, info):
+        super().__init__(car)
+        self.info = info
+        self.drive = Drive(car, ball.pos)
 
     def step(self, dt) -> SimpleControllerState:
         self.controls = SimpleControllerState()
-        ball = self.bot.info.ball
+        ball = self.info.ball
         self.controls = self.drive.step(dt)
 
         if ball.pos.x != 0.0 and ball.pos.y != 0.0:

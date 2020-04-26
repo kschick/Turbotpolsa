@@ -27,7 +27,7 @@ class MyBot(BaseAgent):
     def initialize_agent(self):
         # This runs once before the bot starts up
         self.controls = SimpleControllerState()
-        self.info = GameInfo(self.index, self.team)
+        self.info: GameInfo = GameInfo(self.index, self.team)
 
     def get_output(self, packet: GameTickPacket) -> SimpleControllerState:
         # Read packet
@@ -35,7 +35,8 @@ class MyBot(BaseAgent):
             self.info.read_field_info(self.get_field_info())
             if not self.info.field_info_loaded:
                 return SimpleControllerState()
-        self.info.read_packet(packet)
+        
+        self.info.read_packet(packet, self.get_field_info())
 
         self.time = self.info.time
         dt = self.time - self.prev_time
@@ -66,9 +67,9 @@ class MyBot(BaseAgent):
         # Check kickoff
         if self.info.is_kickoff and not self.doing_kickoff:
             self.doing_kickoff = True
-            return Kickoff(self)
+            return Kickoff(car)
 
-        return Drive(self, ball.pos)
+        return Drive(car, ball.pos)
 
 
 def draw_debug(renderer, car, ball, bot):
